@@ -1,4 +1,4 @@
-# 🐍 SSH BRUTE FORCE DETECTION & ALERT AUTOMATION
+# 🐍 Python Automated Brute Force Detection
 
 
 
