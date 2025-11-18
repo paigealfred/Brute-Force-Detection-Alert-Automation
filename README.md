@@ -377,22 +377,6 @@ This project demonstrates:
 - **Incident Response Workflows** - Generating actionable alerts with severity classification
 - **Production-Ready Code** - Error handling, configurability, and clear output formatting
 
-## 🔐 Security Considerations
-
-⚠️ **Threshold Tuning**: Default threshold (5 failures) may require adjustment based on:
-- Environment size (higher thresholds for large user bases)
-- Authentication mechanisms (MFA reduces false positives)
-- Attack surface (internet-facing SSH requires stricter thresholds)
-
-⚠️ **False Positives**: Legitimate scenarios triggering alerts:
-- Users genuinely forgetting passwords
-- Automated systems with misconfigured credentials
-- Time zone differences causing repeated login attempts
-
-⚠️ **Performance**: For logs exceeding 100K events, consider:
-- Streaming log processing instead of loading entire file into memory
-- Database storage for failed_attempts tracking
-- Parallel processing for multi-threaded analysis
 
 ## 📈 Future Enhancements
 
@@ -402,16 +386,3 @@ This project demonstrates:
 - [ ] **Dashboard Integration**: Export alerts to Splunk/Elastic via API
 - [ ] **Machine Learning**: Anomaly detection for sophisticated, low-and-slow attacks
 
-## 📝 Author
-
-**Paige Alfred**  
-SOC Analyst | Detection Engineer  
-[GitHub](https://github.com/paigealfred) | [LinkedIn](https://linkedin.com/in/paigealfred)
-
-## 📄 License
-
-This project is open-source and available for educational and professional use.
-
----
-
-**⭐ If this project helped you, please star the repository!**
