@@ -10,10 +10,10 @@ This Python-based security automation tool monitors authentication logs for SSH 
 ### Authentication Logs Input
 ![Auth Logs](1_auth_logs_input.png)
 
-### Console Detection Output
+### Detection Script #1
 ![Detection Results](3_detection_output.png)
 
-### Detection Script
+### Detection Script #2
 ![Python Script](2_detection_script.png)
 
 ### Alert CSV Export
