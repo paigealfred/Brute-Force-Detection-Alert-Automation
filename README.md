@@ -1,4 +1,4 @@
-### ⚠️ [Python Automated Brute Force Attempt]
+### ⚠️ Python Automated Brute Force Attempt
 
 
 
