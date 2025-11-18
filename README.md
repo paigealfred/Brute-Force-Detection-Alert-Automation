@@ -115,30 +115,6 @@ python bruteforce_detector.py
 Saved 1 alert(s) to bruteforce_alerts.csv
 ```
 
-## 📊 Configuration
-
-### Modify Detection Threshold
-
-Edit `bruteforce_detector.py`:
-```python
-FAIL_THRESHOLD: int = 5  # Change to desired failed attempt count
-```
-
-### Adjust Severity Levels
-
-Modify lines 30-31:
-```python
-'severity': 'high' if count >= (FAIL_THRESHOLD * 2) else 'medium'
-# Example: Change multiplier for stricter/looser classification
-```
-
-### Custom Log File Path
-
-Update line 4:
-```python
-LOG_FILE: str = "auth_logs.csv"  # Change to your log file location
-```
-
 ## 🧠 Code Breakdown
 
 ### Line-by-Line Explanation
