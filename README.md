@@ -87,33 +87,6 @@ soc_automation/
 └── bruteforce_alerts.csv      # Output: Generated security alerts
 ```
 
-## 🔧 Installation & Usage
-
-### Prerequisites
-```bash
-Python 3.7 or higher
-```
-
-### Setup
-```bash
-# Clone the repository
-git clone https://github.com/paigealfred/soc-bruteforce-automation.git
-cd soc-bruteforce-automation
-
-# Ensure auth_logs.csv is in the same directory
-# Or modify LOG_FILE variable in bruteforce_detector.py
-```
-
-### Run Detection
-```bash
-python bruteforce_detector.py
-```
-
-### Expected Output
-```
-[ALERT] Possible brute force on user carol from 172.16.0.3 - 5 failed logins
-Saved 1 alert(s) to bruteforce_alerts.csv
-```
 
 ## 🧠 Code Breakdown
 
