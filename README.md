@@ -4,6 +4,22 @@
 
 This Python-based security automation tool monitors authentication logs for SSH brute force attacks, automatically detects suspicious activity based on configurable thresholds, and generates severity-based alerts for SOC analysts. The tool processes authentication events, tracks failed login attempts per user/IP combination, and exports actionable alerts to CSV format for incident response workflows.
 
+
+## 📸 Screenshots
+
+### Authentication Logs Input
+![Auth Logs](1_auth_logs_input.png)
+
+### Detection Script
+![Python Script](2_detection_script.png)
+
+### Console Output
+![Detection Results](3_detection_output.png)
+
+### Alert CSV Export
+![CSV Output](4_alerts_csv.png)
+
+
 ## 🔍 Use Case
 
 In production SOC environments, analysts face thousands of authentication events daily. Manual review is time-intensive and prone to human error. This automation:
