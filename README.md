@@ -147,196 +147,277 @@ LOG_FILE: str = "auth_logs.csv"  # Change to your log file location
 import csv
 from collections import defaultdict
 ```
-**Purpose:** Import required libraries  
-- `csv`: Provides CSV file reading/writing capabilities for structured log data
-- `defaultdict`: Auto-initializes dictionary values to `int(0)`, eliminating KeyError exceptions when tracking failed attempts
+**What it does:** Imports required Python modules  
+**How it works:**
+- `import csv` - Loads the CSV module for reading/writing comma-separated value files
+- `from collections import defaultdict` - Imports defaultdict class from collections module for automatic dictionary value initialization
 
 ---
 
 ```python
 LOG_FILE: str = "auth_logs.csv"
 ```
-**Purpose:** Define input log file path  
-**Why Needed:** Centralizes file location for easy modification without changing core logic
+**What it does:** Declares a constant variable `LOG_FILE` of type `str` (string) and assigns it the value `"auth_logs.csv"`  
+**How it works:** Defines the input file path as a string variable. The type hint `: str` indicates this variable should contain string data  
+**Why needed:** Centralizes the file path in one location for easy configuration changes
 
 ---
 
 ```python
 FAIL_THRESHOLD: int = 5
 ```
-**Purpose:** Set brute force detection threshold  
-**Why Needed:** Configurable trigger point balancing false positives (too low) vs. missed attacks (too high)
+**What it does:** Declares a constant variable `FAIL_THRESHOLD` of type `int` (integer) and assigns it the value `5`  
+**How it works:** Sets the minimum number of failed login attempts required to trigger an alert  
+**Why needed:** Provides configurable detection sensitivity - lower values catch more attempts but may increase false positives
 
 ---
 
 ```python
 failed_attempts = defaultdict(int)
 ```
-**Purpose:** Initialize tracking dictionary for failed login counts  
-**How It Works:** 
-- Key: `(username, src_ip)` tuple
-- Value: Integer count of failures
-- `defaultdict(int)` returns `0` for new keys, avoiding `if key exists` checks
+**What it does:** Creates a variable `failed_attempts` and assigns it a `defaultdict` object with `int` as the default factory  
+**How it works:** `defaultdict(int)` creates a dictionary that automatically initializes new keys with value `0` (the default value for `int()`)  
+**Why needed:** Eliminates the need to check if a key exists before incrementing - accessing a non-existent key returns `0` instead of raising a `KeyError`
 
 ---
 
 ```python
 with open(LOG_FILE, "r") as f:
+```
+**What it does:** Opens the file specified in `LOG_FILE` in read mode (`"r"`) and assigns the file object to variable `f`  
+**How it works:** The `with` statement creates a context manager that automatically closes the file when the block exits, even if an error occurs  
+**Why needed:** Ensures proper file handling and automatic resource cleanup
+
+---
+
+```python
     reader = csv.DictReader(f)
 ```
-**Purpose:** Open log file in read mode and create CSV parser  
-**Why `DictReader`:** Returns each row as a dictionary (`{'username': 'alice', ...}`), enabling intuitive column access vs. index-based parsing
+**What it does:** Creates a `csv.DictReader` object from file object `f` and assigns it to variable `reader`  
+**How it works:** `DictReader` reads the CSV file and converts each row into a dictionary where keys are column headers and values are cell contents  
+**Why needed:** Allows accessing CSV data by column name (e.g., `row['username']`) instead of numeric index
 
 ---
 
 ```python
-for row in reader:
+    for row in reader:
 ```
-**Purpose:** Iterate through each authentication event  
-**Why Needed:** Process logs sequentially to aggregate failure counts
+**What it does:** Iterates through each row in the `reader` object, assigning each dictionary to variable `row`  
+**How it works:** For loop executes once per CSV row, with `row` containing a dictionary of that row's data  
+**Why needed:** Processes each authentication event sequentially
 
 ---
 
 ```python
-status = row.get('status', '').upper()
-username = row.get('username', '')
-src_ip = row.get('src_ip', '')
+        status = row.get('status', '').upper()
 ```
-**Purpose:** Extract and normalize event fields  
-**Why `.get()` Method:** Safely handles missing columns, returning empty string instead of raising KeyError  
-**Why `.upper()`:** Ensures case-insensitive status matching ('failed' vs. 'FAILED')
+**What it does:** Retrieves the value of key `'status'` from dictionary `row`, defaults to empty string if key doesn't exist, converts result to uppercase, and assigns to variable `status`  
+**How it works:** 
+- `row.get('status', '')` - Dictionary method that returns value for key `'status'`, or `''` if key is missing
+- `.upper()` - String method that converts all characters to uppercase
+**Why needed:** Safely extracts status field and normalizes case for consistent comparison
 
 ---
 
 ```python
-if status == 'FAILED':
+        username = row.get('username', '')
 ```
-**Purpose:** Filter only failed authentication attempts  
-**Why Needed:** Ignore successful logins to focus on brute force indicators
+**What it does:** Retrieves the value of key `'username'` from dictionary `row`, defaults to empty string if key doesn't exist, and assigns to variable `username`  
+**How it works:** Uses dictionary `.get()` method with default value to prevent KeyError  
+**Why needed:** Extracts the username field from the current log entry
 
 ---
 
 ```python
-key = (username, src_ip)
-failed_attempts[key] += 1
+        src_ip = row.get('src_ip', '')
 ```
-**Purpose:** Increment failure count for this user/IP combination  
-**Why Tuple Key:** Tracks per-source attacks on specific accounts (not just total failures per IP)  
-**Example:** `('admin', '10.0.0.5')` counted separately from `('root', '10.0.0.5')`
+**What it does:** Retrieves the value of key `'src_ip'` from dictionary `row`, defaults to empty string if key doesn't exist, and assigns to variable `src_ip`  
+**How it works:** Uses dictionary `.get()` method with default value to prevent KeyError  
+**Why needed:** Extracts the source IP address field from the current log entry
+
+---
+
+```python
+        if status == 'FAILED':
+```
+**What it does:** Conditional statement that checks if variable `status` equals the string `'FAILED'`  
+**How it works:** Uses equality operator `==` to compare strings. Executes indented code block only if condition is `True`  
+**Why needed:** Filters events to process only failed authentication attempts, ignoring successful logins
+
+---
+
+```python
+            key = (username, src_ip)
+```
+**What it does:** Creates a tuple containing `username` and `src_ip`, assigns it to variable `key`  
+**How it works:** Parentheses `()` create an immutable tuple data structure  
+**Why needed:** Combines username and IP into a single composite key for tracking per-user, per-IP failed attempts
+
+---
+
+```python
+            failed_attempts[key] += 1
+```
+**What it does:** Increments the value associated with `key` in the `failed_attempts` dictionary by 1  
+**How it works:** 
+- `failed_attempts[key]` - Accesses dictionary value for `key` (returns `0` if new key due to defaultdict)
+- `+= 1` - Shorthand for `failed_attempts[key] = failed_attempts[key] + 1`
+**Why needed:** Counts total failed attempts for each username/IP combination
 
 ---
 
 ```python
 alerts = []
 ```
-**Purpose:** Initialize list to store detected threats  
-**Why List:** Allows appending multiple alerts for batch CSV export
+**What it does:** Creates an empty list and assigns it to variable `alerts`  
+**How it works:** Square brackets `[]` create a new list object in Python  
+**Why needed:** Initializes a container to store alert dictionaries for later export
 
 ---
 
 ```python
 for (username, src_ip), count in failed_attempts.items():
 ```
-**Purpose:** Iterate through aggregated failure counts  
-**`.items()` Method:** Returns both key (`username, src_ip`) and value (`count`) for processing
+**What it does:** Iterates through key-value pairs in `failed_attempts` dictionary, unpacking tuple key into `username` and `src_ip`, and assigning value to `count`  
+**How it works:**
+- `.items()` - Dictionary method that returns iterable of (key, value) tuples
+- `(username, src_ip), count` - Tuple unpacking that extracts tuple elements into separate variables
+**Why needed:** Processes each tracked username/IP pair and their failure count
 
 ---
 
 ```python
-if count >= FAIL_THRESHOLD:
+    if count >= FAIL_THRESHOLD:
 ```
-**Purpose:** Apply detection threshold  
-**Why `>=`:** Inclusive comparison catches exactly 5 failures (not just 6+)
+**What it does:** Conditional statement that checks if variable `count` is greater than or equal to `FAIL_THRESHOLD`  
+**How it works:** Uses comparison operator `>=` to compare integers. Returns `True` if count meets or exceeds threshold  
+**Why needed:** Filters to only process username/IP pairs that exceed the suspicious activity threshold
 
 ---
 
 ```python
-print(f"[ALERT] Possible brute force on user {username} from {src_ip} - {count} failed logins")
+        print(f"[ALERT] Possible brute force on user {username} from {src_ip} - {count} failed logins")
 ```
-**Purpose:** Real-time console notification for SOC analysts  
-**Why f-string:** Clean, readable output with variable interpolation
+**What it does:** Outputs formatted string to console using f-string interpolation  
+**How it works:**
+- `f"..."` - F-string prefix allows embedding variables using `{variable}` syntax
+- `{username}`, `{src_ip}`, `{count}` - Placeholders replaced with variable values
+- `print()` - Built-in function that writes to standard output
+**Why needed:** Provides real-time alert notification to console for immediate analyst awareness
 
 ---
 
 ```python
-alerts.append({
-    'username': username,
-    'src_ip': src_ip,
-    'fail_count': count,
-    'severity': 'high' if count >= (FAIL_THRESHOLD * 2) else 'medium'
-})
+        alerts.append({
+            'username': username,
+            'src_ip': src_ip,
+            'fail_count': count,
+            'severity': 'high' if count >= (FAIL_THRESHOLD * 2) else 'medium'
+        })
 ```
-**Purpose:** Build alert object with structured data  
-**Severity Logic:**
-- **High:** ≥10 failures (2× threshold) indicates sustained attack
-- **Medium:** 5-9 failures suggests reconnaissance or weak credentials
-**Why Dictionary:** Matches CSV fieldnames for DictWriter export
+**What it does:** Creates a dictionary with alert data and appends it to the `alerts` list  
+**How it works:**
+- `{}` - Creates a dictionary with key-value pairs
+- Ternary operator: `'high' if condition else 'medium'` - Assigns `'high'` if condition is `True`, otherwise `'medium'`
+- `FAIL_THRESHOLD * 2` - Multiplies threshold by 2 (e.g., `5 * 2 = 10`)
+- `.append()` - List method that adds element to end of list
+**Why needed:** Stores structured alert data for CSV export, with dynamic severity classification
 
 ---
 
 ```python
 if alerts:
 ```
-**Purpose:** Check if any threats were detected  
-**Why Needed:** Prevents creating empty CSV files when no alerts triggered
+**What it does:** Conditional statement that checks if `alerts` list contains any elements  
+**How it works:** Empty lists evaluate to `False` in boolean context, non-empty lists evaluate to `True`  
+**Why needed:** Only executes CSV export code if alerts were generated, preventing creation of empty files
 
 ---
 
 ```python
-output_file = 'bruteforce_alerts.csv'
-fieldnames = ['username', 'src_ip', 'fail_count', 'severity']
+    output_file = 'bruteforce_alerts.csv'
 ```
-**Purpose:** Define export configuration  
-**`fieldnames` List:** Specifies CSV column order and headers
+**What it does:** Creates a variable `output_file` of type string and assigns it the value `'bruteforce_alerts.csv'`  
+**How it works:** String literal assignment using single quotes  
+**Why needed:** Defines the output filename for the alert CSV file
 
 ---
 
 ```python
-with open(output_file, 'w', newline='') as f:
+    fieldnames = ['username', 'src_ip', 'fail_count', 'severity']
 ```
-**Purpose:** Open output file in write mode  
-**`newline=''` Parameter:** Prevents extra blank rows in Windows environments (CSV module requirement)
+**What it does:** Creates a list containing four string elements and assigns it to variable `fieldnames`  
+**How it works:** Square brackets `[]` create a list, comma-separated strings are list elements  
+**Why needed:** Defines CSV column headers and order for DictWriter
 
 ---
 
 ```python
-writer = csv.DictWriter(f, fieldnames=fieldnames)
+    with open(output_file, 'w', newline='') as f:
 ```
-**Purpose:** Create CSV writer with defined columns  
-**`DictWriter`:** Maps dictionary keys to CSV columns automatically
+**What it does:** Opens file specified in `output_file` in write mode (`'w'`), with `newline=''` parameter, assigns file object to variable `f`  
+**How it works:**
+- `'w'` mode - Creates new file or overwrites existing file
+- `newline=''` - Prevents extra blank lines in CSV on Windows (required by csv module)
+- `with` statement - Context manager for automatic file closing
+**Why needed:** Prepares file for writing CSV data with proper line ending handling
 
 ---
 
 ```python
-writer.writeheader()
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
 ```
-**Purpose:** Write column names as first row  
-**Example Output:** `username,src_ip,fail_count,severity`
+**What it does:** Creates a `csv.DictWriter` object with file object `f` and column names from `fieldnames`, assigns to variable `writer`  
+**How it works:** `DictWriter` constructor takes file object and fieldnames list, returns writer object that maps dictionary keys to CSV columns  
+**Why needed:** Enables writing dictionary objects as CSV rows with specified column order
 
 ---
 
 ```python
-writer.writerows(alerts)
+        writer.writeheader()
 ```
-**Purpose:** Write all alert dictionaries to CSV  
-**Batch Operation:** More efficient than writing one row at a time
+**What it does:** Calls `writeheader()` method on `writer` object to write column names as first CSV row  
+**How it works:** Method uses `fieldnames` list to create header row automatically  
+**Why needed:** Creates CSV header row so output file has labeled columns
 
 ---
 
 ```python
-print(f"\nSaved {len(alerts)} alert(s) to {output_file}")
+        writer.writerows(alerts)
 ```
-**Purpose:** Confirm successful export with alert count  
-**`\n` Character:** Adds blank line for readability
+**What it does:** Calls `writerows()` method on `writer` object, passing `alerts` list as argument  
+**How it works:** Iterates through `alerts` list and writes each dictionary as a CSV row, mapping dictionary keys to columns  
+**Why needed:** Batch-writes all alerts to CSV file efficiently
+
+---
+
+```python
+    print(f"\nSaved {len(alerts)} alert(s) to {output_file}")
+```
+**What it does:** Outputs formatted string to console showing number of alerts saved and output filename  
+**How it works:**
+- `\n` - Escape sequence that inserts newline character
+- `len(alerts)` - Built-in function that returns integer count of list elements
+- F-string interpolation embeds variable values
+**Why needed:** Confirms successful file save operation with alert count
 
 ---
 
 ```python
 else:
+```
+**What it does:** Defines the else clause for the `if alerts:` conditional  
+**How it works:** Executes indented code block only when the `if` condition is `False` (empty alerts list)  
+**Why needed:** Provides alternative code path when no alerts are detected
+
+---
+
+```python
     print('\nNo brute-force alerts found.')
 ```
-**Purpose:** Notify analyst when no threats detected  
-**Why Important:** Confirms script ran successfully even with clean logs
+**What it does:** Outputs string to console indicating no threats detected  
+**How it works:** `print()` function with string literal argument, `\n` adds newline before message  
+**Why needed:** Informs analyst that script completed successfully but found no suspicious activity
 
 ## 🎓 Learning Outcomes
 
@@ -374,3 +455,14 @@ This project demonstrates:
 
 ## 📝 Author
 
+**Paige Alfred**  
+SOC Analyst | Detection Engineer  
+[GitHub](https://github.com/paigealfred) | [LinkedIn](https://linkedin.com/in/paigealfred)
+
+## 📄 License
+
+This project is open-source and available for educational and professional use.
+
+---
+
+**⭐ If this project helped you, please star the repository!**
