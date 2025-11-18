@@ -1,5 +1,8 @@
 ### ⚠️ [Python Automated Brute Force Attempt]
 
+
+
+
 ## 🎯 Project Overview
 
 This Python-based security automation tool monitors authentication logs for SSH brute force attacks, automatically detects suspicious activity based on configurable thresholds, and generates severity-based alerts for SOC analysts. The tool processes authentication events, tracks failed login attempts per user/IP combination, and exports actionable alerts to CSV format for incident response workflows.
